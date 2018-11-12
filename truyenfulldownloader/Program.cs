@@ -163,7 +163,8 @@ namespace truyenfulldownloader
                             result.AppendLine(Footer);
 
                             //write
-                            File.WriteAllText(Path.Combine(name, current + ".html"), result.ToString(), Encoding.UTF8);
+                            var tempPath = Path.Combine(name, current);
+                            File.WriteAllText(tempPath.Substring(0, Math.Min(tempPath.Length, 150)) + ".html", result.ToString(), Encoding.UTF8);
 
                             progressBar.Refresh(cc, current);
                         }
