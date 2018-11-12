@@ -1,0 +1,12 @@
+.bodyday {
+    background-color: lightgray;
+}
+.contentday{
+	color: black;
+}
+.bodynight {
+    background-color: black;
+}
+.contentnight {
+	color: lightgray;
+}

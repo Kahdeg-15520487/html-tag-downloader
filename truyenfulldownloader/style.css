@@ -1,0 +1,18 @@
+.bodynight {
+    background-color: black;
+word-wrap: break-word;
+}
+.contentnight{
+	color: lightgray;
+width: 300px;
+word-wrap: break-word;
+}
+.bodyday{
+    background-color: black;
+word-wrap: break-word;
+}
+.contentday{
+	color: lightgray;
+width: 300px;
+word-wrap: break-word;
+}
