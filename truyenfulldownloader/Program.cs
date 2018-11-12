@@ -20,6 +20,7 @@ namespace truyenfulldownloader
     {
         static readonly string AssemblyLocation = Path.GetDirectoryName(Assembly.GetAssembly(typeof(Program)).Location);
 
+        const string TruyenFullTag = "";
         const string Header = @"<!DOCTYPE html><html lang=""vi""><head><link rel=""stylesheet"" type=""text/css"" href=""style.css""/></head><body class=""bodynight"" id=""body""><div class=""contentnight"" id=""content""><script src=""function.js""></script><button onclick=""changeColor()"" id=""button_change_color"">day</button><br/>";
         const string Footer = @"</div></body></html>";
         const string Link = @"<a href=""!!!!"">!!!!</a><br>";
@@ -31,6 +32,12 @@ namespace truyenfulldownloader
         [Argument('t', "to")]
         static string To { get; set; } = null;
 
+        [Argument('p', "path")]
+        static string XPath { get; set; } = null;
+
+        [Argument('i', "img")]
+        static bool Image { get; set; } = false;
+
         [Operands]
         static string[] Config { get; set; }
 
@@ -41,7 +48,7 @@ namespace truyenfulldownloader
 
             if (Config.Length == 1)
             {
-                Console.WriteLine("truyenfulldownloader -f \"tu chuong\" -t \"toi chuong\" \"ten file config\"");
+                Console.WriteLine("truyenfulldownloader -f \"tu chuong\" -t \"toi chuong\" [-p \"XPath of the html tag\" -i [true|false] ] \"ten file config\"");
                 return;
             }
 
@@ -87,7 +94,7 @@ namespace truyenfulldownloader
 
                     for (; cc < chapterscount; cc++)
                     {
-                        Thread.Sleep(50);
+                        Thread.Sleep(2000);
 
                         // Call the page and get the generated HTML
                         HtmlDocument doc = null;
@@ -102,7 +109,7 @@ namespace truyenfulldownloader
                             }
                             catch (UriFormatException uex)
                             {
-                                Console.WriteLine("{0} : uri format {1}", excount++, uex.Message);
+                                Console.WriteLine("{0} : uri format {2} : {1}", excount++, uex.Message, url + chapters[cc]);
                             }
                             catch (WebException wex)
                             {
@@ -112,8 +119,8 @@ namespace truyenfulldownloader
                         } while (excount != 0);
 
                         //get the div by id and then get the inner text 
-                        string testDivSelector = "//div[@class='chapter-c']";
-                        var node = doc.DocumentNode.SelectSingleNode(testDivSelector);
+                        string xpath = XPath ?? "//div[@class='chapter-c']";
+                        var node = doc.DocumentNode.SelectSingleNode(xpath);
 
                         if (node != null)
                         {
@@ -126,18 +133,24 @@ namespace truyenfulldownloader
                             string linkNext = Link.Replace("!!!!", next);
                             string navigation = Navigation.Replace("!!!!", linkPrev).Replace("????", linkNext);
 
-                            //var testImgSelector = "//img";
-                            //var imgnodes = node.SelectNodes(testImgSelector);
-                            //if (imgnodes != null) {
-                            //	foreach (var imgnode in imgnodes) {
-                            //		var imgUrl = imgnode.Attributes["src"].Value;
-                            //		var imgFileName = Path.GetFileName(imgUrl);
-                            //		using (WebClient client = new WebClient()) {
-                            //			client.DownloadFile(new Uri(imgUrl), Path.Combine(name, imgFileName));
-                            //		}
-                            //		imgnode.Attributes["src"].Value = imgFileName;
-                            //	}
-                            //}
+                            if (Image)
+                            {
+                                var testImgSelector = "//img";
+                                var imgnodes = node.SelectNodes(testImgSelector);
+                                if (imgnodes != null)
+                                {
+                                    foreach (var imgnode in imgnodes)
+                                    {
+                                        var imgUrl = imgnode.Attributes["src"].Value;
+                                        var imgFileName = Path.GetFileName(imgUrl);
+                                        //using (WebClient client = new WebClient())
+                                        //{
+                                        //    client.DownloadFile(new Uri(imgUrl), Path.Combine(name, imgFileName));
+                                        //}
+                                        imgnode.Attributes["src"].Value = imgFileName;
+                                    }
+                                }
+                            }
 
                             var divString = node.InnerHtml;
 
